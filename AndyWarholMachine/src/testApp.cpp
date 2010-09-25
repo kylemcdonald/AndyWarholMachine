@@ -8,16 +8,24 @@ void testApp::setup(){
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
-	avgGrapher.setup(160, 60, 0, 64);
-	devGrapher.setup(160, 60, 0, 64);
+	avgGrapher.setup(180, 60, 0, 60);
+	devGrapher.setup(180, 60, 0, 60);
 	
 	// panel wtf
-	panel.setup("Control Panel", 10, 10, 300, 600);
+	panel.setup("Control Panel", 10, 10, 300, 700);
 	panel.addPanel("Main", 1);
 	panel.setWhichPanel("Main");
+	panel.addSlider("Adapt Speed", "adaptSpeed", 1000, 1, 1000, false);
 	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
-	panel.addDrawableRect("Difference Average", &avgGrapher, 160, 60);
-	panel.addDrawableRect("Difference Deviation", &devGrapher, 160, 60);
+	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
+	panel.addSlider("Average Low Threshold", "avgMinThreshold", 0, 0, 60, true);
+	panel.addSlider("Average High Threshold", "avgMaxThreshold", 0, 0, 60, true);
+	panel.addToggle("Average Status", "avgStatus", false);
+	panel.addDrawableRect("Difference Deviation", &devGrapher, 180, 60);
+	panel.addSlider("Deviation Low Threshold", "devMinThreshold", 0, 0, 60, true);
+	panel.addSlider("Deviation High Threshold", "devMaxThreshold", 0, 0, 60, true);
+	panel.addToggle("Deviation Status", "devStatus", false);
+	panel.addToggle("Combined Status", "combinedStatus", false);
 }
 
 void testApp::update(){
@@ -26,7 +34,7 @@ void testApp::update(){
 		if(cameraFrames < 10)
 			background.set(camera);
 		else
-			background.lerp(1. / 1000., camera);
+			background.lerp(1. / panel.getValueF("adaptSpeed"), camera);
 		background.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
@@ -36,6 +44,15 @@ void testApp::update(){
 		
 		cameraFrames++;
 	}
+	
+	avgGrapher.setMinThreshold(panel.getValueI("avgMinThreshold"));
+	avgGrapher.setMaxThreshold(panel.getValueI("avgMaxThreshold"));
+	devGrapher.setMinThreshold(panel.getValueI("devMinThreshold"));
+	devGrapher.setMaxThreshold(panel.getValueI("devMaxThreshold"));
+	
+	panel.setValueB("avgStatus", avgGrapher.getStatus());
+	panel.setValueB("devStatus", devGrapher.getStatus());
+	panel.setValueB("combinedStatus", avgGrapher.getStatus() && devGrapher.getStatus());
 }
 
 void testApp::draw(){
