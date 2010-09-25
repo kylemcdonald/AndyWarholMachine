@@ -10,6 +10,14 @@ void testApp::setup(){
 	
 	avgGrapher.setup(160, 60, 0, 64);
 	devGrapher.setup(160, 60, 0, 64);
+	
+	// panel wtf
+	panel.setup("Control Panel", 10, 10, 300, 600);
+	panel.addPanel("Main", 1);
+	panel.setWhichPanel("Main");
+	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
+	panel.addDrawableRect("Difference Average", &avgGrapher, 160, 60);
+	panel.addDrawableRect("Difference Deviation", &devGrapher, 160, 60);
 }
 
 void testApp::update(){
@@ -18,7 +26,7 @@ void testApp::update(){
 		if(cameraFrames < 10)
 			background.set(camera);
 		else
-			background.lerp(.01, camera);
+			background.lerp(1. / 1000., camera);
 		background.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
@@ -31,16 +39,15 @@ void testApp::update(){
 }
 
 void testApp::draw(){
+	ofPushStyle();
+	ofPushMatrix();
 	ofSetColor(255, 255, 255);
 	camera.draw(0, 0, 320, 240);
 	background.draw(320, 0, 320, 240);
 	difference.draw(640, 0, 320, 240);
-	
 	ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
-	
-	ofTranslate(640, 240);
-	avgGrapher.draw(0, 0);
-	devGrapher.draw(160, 0);
+	ofPopMatrix();
+	ofPopStyle();
 }
 
 void testApp::keyPressed(int key){

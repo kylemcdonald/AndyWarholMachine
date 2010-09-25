@@ -4,6 +4,7 @@
 #include "FloatImage.h"
 #include "DifferenceImage.h"
 #include "Grapher.h"
+#include "ofxAutoControlPanel.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -26,4 +27,6 @@ public:
 	Grapher avgGrapher, devGrapher;
 	
 	int cameraFrames;
+	
+	ofxAutoControlPanel panel;
 };

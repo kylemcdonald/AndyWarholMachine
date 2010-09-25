@@ -2,11 +2,11 @@
 
 #include "ofMain.h"
 
-class Grapher {
+class Grapher : public ofBaseDraws {
 protected:
 	int width, height;
 	float min, max;
-	list<float> values;
+	list<float> values; // should really be a circular buffer
 public:
 	void setup(int width, int height, int min, int max) {
 		this->width = width;
@@ -19,7 +19,16 @@ public:
 		if(values.size() > width)
 			values.pop_back();
 	}
-	void draw(int x, int y) {
+	float getWidth() {
+		return width;
+	}
+	float getHeight() {
+		return height;
+	}
+	void draw(float x, float y) {
+		draw(x, y, width, height);
+	}
+	void draw(float x, float y, float width, float height) {
 		ofPushStyle();
 		ofPushMatrix();
 		ofTranslate(x, y);
@@ -31,13 +40,16 @@ public:
 		ofNoFill();
 		ofSetColor(255, 255, 255);
 		ofRect(0, 0, width, height);
+		glPushMatrix();
+		glScalef(width / (this->width), height / (this->height), 0);
 		glBegin(GL_LINE_STRIP);
 		int i = 0;
 		for(list<float>::iterator itr = values.begin(); itr != values.end(); itr++) {
-			glVertex2f(width - i, *itr);
+			glVertex2f(this->width - i, *itr);
 			i++;
 		}
 		glEnd();
+		glPopMatrix();
 		
 		ofPopMatrix();
 		ofPopStyle();
