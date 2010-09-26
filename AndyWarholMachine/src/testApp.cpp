@@ -15,7 +15,7 @@ void testApp::setup(){
 	panel.setup("Control Panel", 10, 10, 300, 700);
 	panel.addPanel("Main", 1);
 	panel.setWhichPanel("Main");
-	panel.addSlider("Adapt Speed", "adaptSpeed", 1000, 1, 1000, false);
+	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
 	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
 	panel.addSlider("Average Low Threshold", "avgMinThreshold", 0, 0, 60, true);
@@ -34,7 +34,7 @@ void testApp::update(){
 		if(cameraFrames < 10)
 			background.set(camera);
 		else
-			background.lerp(1. / panel.getValueF("adaptSpeed"), camera);
+			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
 		background.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
