@@ -8,5 +8,6 @@ protected:
 public:
 	VideoBuffer();
 	void setup(int width, int height, int frames);
-	ofImage& get(int i);
+	void set(int i, ofBaseImage& img);
+	virtual ofImage& get(int i);
 };

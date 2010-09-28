@@ -4,7 +4,7 @@
 #include "FloatImage.h"
 #include "DifferenceImage.h"
 #include "Grapher.h"
-#include "VideoBuffer.h"
+#include "VideoDelay.h"
 #include "ofxAutoControlPanel.h"
 
 class testApp : public ofBaseApp{
@@ -31,6 +31,7 @@ public:
 	
 	ofxAutoControlPanel panel;
 	
-	VideoBuffer videoBuffer;
+	VideoDelay videoDelay;
+	ofImage curDelay;
 	int maxDelay;
 };

@@ -6,7 +6,7 @@ void testApp::setup(){
 	int camWidth = 640;
 	int camHeight = 480;	
 	int camFramerate = 30;
-	maxDelay = 15;
+	maxDelay = 1;
 	
 	cameraFrames = 0;
 	camera.initGrabber(camWidth, camHeight);
@@ -16,7 +16,8 @@ void testApp::setup(){
 	avgGrapher.setup(180, 60, 0, 60);
 	devGrapher.setup(180, 60, 0, 60);
 	
-	videoBuffer.setup(camWidth, camHeight, camFramerate * maxDelay);
+	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
+	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
 	// panel setup
 	panel.setup("Control Panel", 10, 10, 300, 700);
@@ -33,6 +34,10 @@ void testApp::setup(){
 	panel.addSlider("Deviation High Threshold", "devMaxThreshold", 0, 0, 60, true);
 	panel.addToggle("Deviation Status", "devStatus", false);
 	panel.addToggle("Combined Status", "combinedStatus", false);
+	
+	panel.addPanel("Delay", 1);
+	panel.setWhichPanel("Delay");
+	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
 }
 
 void testApp::update(){
@@ -43,6 +48,12 @@ void testApp::update(){
 		else
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
 		background.update();
+		
+		videoDelay.add(camera);
+		int delayAmount = panel.getValueI("delayAmount");
+		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
+		memcpy(curDelay.getPixels(), videoDelay.get(delayAmount).getPixels(), n);
+		curDelay.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
 		difference.update();
@@ -66,9 +77,10 @@ void testApp::draw(){
 	ofPushStyle();
 	ofPushMatrix();
 	ofSetColor(255, 255, 255);
-	camera.draw(0, 0, 320, 240);
-	background.draw(320, 0, 320, 240);
-	difference.draw(640, 0, 320, 240);
+	camera.draw(320 * 0, 0, 320, 240);
+	background.draw(320 * 1, 0, 320, 240);
+	difference.draw(320 * 2, 0, 320, 240);
+	curDelay.draw(320 * 3, 0, 320, 240);
 	ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
 	ofPopMatrix();
 	ofPopStyle();
