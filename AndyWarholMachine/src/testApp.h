@@ -4,6 +4,7 @@
 #include "FloatImage.h"
 #include "DifferenceImage.h"
 #include "Grapher.h"
+#include "VideoBuffer.h"
 #include "ofxAutoControlPanel.h"
 
 class testApp : public ofBaseApp{
@@ -29,4 +30,7 @@ public:
 	int cameraFrames;
 	
 	ofxAutoControlPanel panel;
+	
+	VideoBuffer videoBuffer;
+	int maxDelay;
 };

@@ -1,8 +1,13 @@
 #include "testApp.h"
 
 void testApp::setup(){
+	ofSetLogLevel(OF_LOG_VERBOSE);
+	
 	int camWidth = 640;
 	int camHeight = 480;	
+	int camFramerate = 30;
+	maxDelay = 15;
+	
 	cameraFrames = 0;
 	camera.initGrabber(camWidth, camHeight);
 	background.setup(camWidth, camHeight);
@@ -11,7 +16,9 @@ void testApp::setup(){
 	avgGrapher.setup(180, 60, 0, 60);
 	devGrapher.setup(180, 60, 0, 60);
 	
-	// panel wtf
+	videoBuffer.setup(camWidth, camHeight, camFramerate * maxDelay);
+	
+	// panel setup
 	panel.setup("Control Panel", 10, 10, 300, 700);
 	panel.addPanel("Main", 1);
 	panel.setWhichPanel("Main");
