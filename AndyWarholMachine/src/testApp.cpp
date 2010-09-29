@@ -34,14 +34,11 @@ void testApp::setup(){
 	panel.setWhichPanel("Detection");
 	panel.setWhichColumn(0);
 	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
-	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
-	panel.addSlider("Average Low Threshold", "avgMinThreshold", 0, 0, 60, true);
-	panel.addSlider("Average High Threshold", "avgMaxThreshold", 0, 0, 60, true);
+	panel.addSlider("Average Threshold", "avgThreshold", 0, 0, 60, true);
 	panel.addToggle("Average Status", "avgStatus", false);
 	panel.addDrawableRect("Difference Deviation", &devGrapher, 180, 60);
-	panel.addSlider("Deviation Low Threshold", "devMinThreshold", 0, 0, 60, true);
-	panel.addSlider("Deviation High Threshold", "devMaxThreshold", 0, 0, 60, true);
+	panel.addSlider("Deviation Threshold", "devThreshold", 0, 0, 60, true);
 	panel.addToggle("Deviation Status", "devStatus", false);
 	panel.setWhichColumn(1);
 	panel.addDrawableRect("Camera Input", &camera, 240, 180);
@@ -114,10 +111,8 @@ void testApp::update(){
 		curDelay.update();
 	}
 	
-	avgGrapher.setMinThreshold(panel.getValueI("avgMinThreshold"));
-	avgGrapher.setMaxThreshold(panel.getValueI("avgMaxThreshold"));
-	devGrapher.setMinThreshold(panel.getValueI("devMinThreshold"));
-	devGrapher.setMaxThreshold(panel.getValueI("devMaxThreshold"));
+	avgGrapher.setThreshold(panel.getValueI("avgThreshold"));
+	devGrapher.setThreshold(panel.getValueI("devThreshold"));
 	
 	panel.setValueB("avgStatus", avgGrapher.getStatus());
 	panel.setValueB("devStatus", devGrapher.getStatus());
@@ -143,7 +138,7 @@ void testApp::draw(){
 	float imgAspect = imgWidth / imgHeight;
 	float scrWidth = ofGetWidth();
 	float scrHeight = ofGetHeight();
-	curDelay.setAnchorPercent(.5, .5);
+	curDelay.setAnchorPercent(.5, .5);	
 	glPushMatrix();
 	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
 	if(panel.getValueB("letterboxVideo"))

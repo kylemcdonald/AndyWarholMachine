@@ -1,9 +1,7 @@
 #include "Grapher.h"
 
 Grapher::Grapher() :
-minThreshold(0),
-maxThreshold(0),
-status(false) {
+threshold(0) {
 }
 
 void Grapher::setup(int width, int height, int min, int max) {
@@ -13,22 +11,14 @@ void Grapher::setup(int width, int height, int min, int max) {
 	this->max = max;
 }
 
-void Grapher::setMinThreshold(float minThreshold) {
-	this->minThreshold = minThreshold;
-}
-
-void Grapher::setMaxThreshold(float maxThreshold) {
-	this->maxThreshold = maxThreshold;
+void Grapher::setThreshold(float threshold) {
+	this->threshold = threshold;
 }
 
 void Grapher::addValue(float value) {
 	values.push_front(value);
 	if(values.size() > width)
 		values.pop_back();
-	if(value < minThreshold)
-		status = false;
-	if(value > maxThreshold)
-		status = true;
 }
 
 float Grapher::getWidth() {
@@ -66,10 +56,8 @@ void Grapher::draw(float x, float y, float width, float height) {
 	glEnd();
 	glPopMatrix();
 	
-	int minThresholdY = ofMap(minThreshold, min, max, height, 0);
-	int maxThresholdY = ofMap(maxThreshold, min, max, height, 0);
-	ofLine(0, minThresholdY, width, minThresholdY);
-	ofLine(0, maxThresholdY, width, maxThresholdY);
+	int thresholdY = ofMap(threshold, min, max, height, 0);
+	ofLine(0, thresholdY, width, thresholdY);
 	
 	int top = 15;
 	int bottom = height - 5;
@@ -83,5 +71,5 @@ void Grapher::draw(float x, float y, float width, float height) {
 }
 
 bool Grapher::getStatus() {
-	return status;
+	return values.front() > threshold;
 }
