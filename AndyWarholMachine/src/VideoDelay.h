@@ -4,18 +4,26 @@
 
 class VideoDelay : public VideoBuffer {
 protected:
-	int position;
+	int writePosition, readPosition;
 public:
 	VideoDelay() :
-	position(0) {
+	writePosition(0),
+	readPosition(0) {
 	}
 	void add(ofBaseImage& img) {
-		set(position, img);
-		position++;
-		if(position == buffer.size())
-			position = 0;
+		set(writePosition, img);
+		//ofLog(OF_LOG_VERBOSE, "Current write position: " + ofToString(writePosition));
+		writePosition++;
+		if(writePosition == buffer.size())
+			writePosition = 0;
 	}
-	ofImage& get(int i) {
-		return VideoBuffer::get((position + buffer.size() - i - 1) % buffer.size());
+	ofImage& read(int offset) {
+		int curPosition = (readPosition + buffer.size() - offset - 1) % buffer.size();
+		//ofLog(OF_LOG_VERBOSE, "Current read position: " + ofToString(curPosition));
+		ofImage& cur = get(curPosition);
+		readPosition++;
+		if(readPosition == buffer.size())
+			readPosition = 0;
+		return cur;
 	}
 };

@@ -23,6 +23,7 @@ public:
 	void windowResized(int w, int h);
 	
 	ofVideoGrabber camera;
+	bool cameraReady;
 	FloatImage background;
 	DifferenceImage difference;
 	

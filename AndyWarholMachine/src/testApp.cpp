@@ -6,10 +6,12 @@ void testApp::setup(){
 	int camWidth = 640;
 	int camHeight = 480;	
 	int camFramerate = 30;
-	maxDelay = 1;
+	maxDelay = 10;
 	
 	cameraFrames = 0;
 	camera.initGrabber(camWidth, camHeight);
+	camera.setDesiredFrameRate(30);
+	cameraReady = false;
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
@@ -18,7 +20,6 @@ void testApp::setup(){
 	
 	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
-	delayTimer.setFramerate(1);
 	
 	// panel setup
 	panel.setup("Control Panel", 10, 10, 300, 700);
@@ -39,16 +40,19 @@ void testApp::setup(){
 	panel.addPanel("Delay", 1);
 	panel.setWhichPanel("Delay");
 	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
-	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
+	panel.addSlider("Playback Framerate", "playbackFramerate", 10, 1, 60, true);
 }
 
 void testApp::update(){
 	camera.update();
 	if(camera.isFrameNew()) {
-		if(cameraFrames < 10)
+		if(cameraFrames < 10) {
 			background.set(camera);
-		else
+			cameraReady = false;
+		} else {
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
+			cameraReady = true;
+		}
 		background.update();
 		
 		videoDelay.add(camera);
@@ -62,10 +66,10 @@ void testApp::update(){
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
-	if(delayTimer.tick()) {
+	if(delayTimer.tick() && cameraReady) {
 		int delayAmount = panel.getValueI("delayAmount");
 		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
-		memcpy(curDelay.getPixels(), videoDelay.get(delayAmount).getPixels(), n);
+		memcpy(curDelay.getPixels(), videoDelay.read(delayAmount).getPixels(), n);
 		curDelay.update();
 	}
 	
