@@ -188,6 +188,7 @@
 		27E74F4A12528EE40089D6BB /* VideoBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoBuffer.cpp; sourceTree = "<group>"; };
 		27E74F8E125299AF0089D6BB /* VideoDelay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoDelay.h; sourceTree = "<group>"; };
 		27E74F8F125299AF0089D6BB /* VideoDelay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoDelay.cpp; sourceTree = "<group>"; };
+		27E74FE11252B9200089D6BB /* DelayTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelayTimer.h; sourceTree = "<group>"; };
 		E45BE0390E8CC647009D7055 /* FreeImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeImage.h; path = ../../../libs/freeimage/include/FreeImage.h; sourceTree = SOURCE_ROOT; };
 		E45BE03F0E8CC650009D7055 /* fmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmod.h; path = ../../../libs/fmodex/include/fmod.h; sourceTree = SOURCE_ROOT; };
 		E45BE0400E8CC650009D7055 /* fmod.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = fmod.hpp; path = ../../../libs/fmodex/include/fmod.hpp; sourceTree = SOURCE_ROOT; };
@@ -613,6 +614,7 @@
 				27E74F4A12528EE40089D6BB /* VideoBuffer.cpp */,
 				27E74F8E125299AF0089D6BB /* VideoDelay.h */,
 				27E74F8F125299AF0089D6BB /* VideoDelay.cpp */,
+				27E74FE11252B9200089D6BB /* DelayTimer.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

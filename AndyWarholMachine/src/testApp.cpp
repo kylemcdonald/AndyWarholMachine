@@ -18,6 +18,7 @@ void testApp::setup(){
 	
 	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
+	delayTimer.setFramerate(1);
 	
 	// panel setup
 	panel.setup("Control Panel", 10, 10, 300, 700);
@@ -38,6 +39,7 @@ void testApp::setup(){
 	panel.addPanel("Delay", 1);
 	panel.setWhichPanel("Delay");
 	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
+	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
 }
 
 void testApp::update(){
@@ -50,10 +52,6 @@ void testApp::update(){
 		background.update();
 		
 		videoDelay.add(camera);
-		int delayAmount = panel.getValueI("delayAmount");
-		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
-		memcpy(curDelay.getPixels(), videoDelay.get(delayAmount).getPixels(), n);
-		curDelay.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
 		difference.update();
@@ -61,6 +59,14 @@ void testApp::update(){
 		devGrapher.addValue(difference.getStandardDeviation());
 		
 		cameraFrames++;
+	}
+	
+	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
+	if(delayTimer.tick()) {
+		int delayAmount = panel.getValueI("delayAmount");
+		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
+		memcpy(curDelay.getPixels(), videoDelay.get(delayAmount).getPixels(), n);
+		curDelay.update();
 	}
 	
 	avgGrapher.setMinThreshold(panel.getValueI("avgMinThreshold"));

@@ -6,6 +6,7 @@
 #include "Grapher.h"
 #include "VideoDelay.h"
 #include "ofxAutoControlPanel.h"
+#include "DelayTimer.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -34,4 +35,5 @@ public:
 	VideoDelay videoDelay;
 	ofImage curDelay;
 	int maxDelay;
+	DelayTimer delayTimer;
 };
