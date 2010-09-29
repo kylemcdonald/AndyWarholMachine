@@ -20,6 +20,8 @@ void testApp::setup(){
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
+	videoSaver.setup(camWidth, camHeight, "output.mov");
+	
 	avgGrapher.setup(180, 60, 0, 60);
 	devGrapher.setup(180, 60, 0, 60);
 	
@@ -45,10 +47,11 @@ void testApp::setup(){
 	panel.addPanel("Delay", 1);
 	panel.setWhichPanel("Delay");
 	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
-	panel.addSlider("Playback Framerate", "playbackFramerate", 10, 1, 60, true);
+	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
 	panel.addDrawableRect("Camera Framerate", &cameraFpsGrapher, 180, 60);
 	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
-
+	panel.addSlider("Write Position", "writePosition", 0, 0, 1, false);
+	panel.addSlider("Read Position", "readPosition", 0, 0, 1, false);
 }
 
 void testApp::update(){
@@ -60,10 +63,18 @@ void testApp::update(){
 		} else {
 			cameraReady = true;
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
+			
 			if(cameraFpsTimer.getFramerate() < (15 + 30) / 2)
 				videoDelay.add(camera); // double up frames for 15 fps
 			videoDelay.add(camera);
+			
 			cameraFpsTimer.tick();
+		}
+		
+		if(cameraFrames < 30 * 10) {
+			videoSaver.addFrame(camera.getPixels(), 1. / 30);
+		} else if(cameraFrames == 30 * 10) {
+			videoSaver.finishMovie();
 		}
 		
 		background.update();
@@ -83,7 +94,7 @@ void testApp::update(){
 	if(delayTimer.tick() && cameraReady) {
 		int delayAmount = panel.getValueI("delayAmount");
 		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
-		memcpy(curDelay.getPixels(), videoDelay.read(delayAmount).getPixels(), n);
+		memcpy(curDelay.getPixels(), videoDelay.read().getPixels(), n);
 		curDelay.update();
 	}
 	
@@ -95,6 +106,9 @@ void testApp::update(){
 	panel.setValueB("avgStatus", avgGrapher.getStatus());
 	panel.setValueB("devStatus", devGrapher.getStatus());
 	panel.setValueB("combinedStatus", avgGrapher.getStatus() && devGrapher.getStatus());
+	
+	panel.setValueF("writePosition", videoDelay.getWritePosition());
+	panel.setValueF("readPosition", videoDelay.getReadPosition());
 }
 
 void testApp::draw(){

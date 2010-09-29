@@ -42,6 +42,7 @@
 		27C2F8051241DCA00096A0EB /* Grapher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27C2F8041241DCA00096A0EB /* Grapher.cpp */; };
 		27E74F4B12528EE40089D6BB /* VideoBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27E74F4A12528EE40089D6BB /* VideoBuffer.cpp */; };
 		27E74F90125299AF0089D6BB /* VideoDelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27E74F8F125299AF0089D6BB /* VideoDelay.cpp */; };
+		27E751171253211A0089D6BB /* ofxQtVideoSaver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27E751151253211A0089D6BB /* ofxQtVideoSaver.cpp */; };
 		E45BE0AA0E8CC67C009D7055 /* GLee.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE0A90E8CC67C009D7055 /* GLee.a */; };
 		E45BE2E40E8CC69C009D7055 /* rtAudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE2E30E8CC69C009D7055 /* rtAudio.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -190,6 +191,8 @@
 		27E74F8F125299AF0089D6BB /* VideoDelay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VideoDelay.cpp; sourceTree = "<group>"; };
 		27E74FE11252B9200089D6BB /* DelayTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelayTimer.h; sourceTree = "<group>"; };
 		27E750551252FEC60089D6BB /* RateTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RateTimer.h; sourceTree = "<group>"; };
+		27E751151253211A0089D6BB /* ofxQtVideoSaver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxQtVideoSaver.cpp; path = ../../../addons/ofxQtVideoSaver/src/ofxQtVideoSaver.cpp; sourceTree = SOURCE_ROOT; };
+		27E751161253211A0089D6BB /* ofxQtVideoSaver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxQtVideoSaver.h; path = ../../../addons/ofxQtVideoSaver/src/ofxQtVideoSaver.h; sourceTree = SOURCE_ROOT; };
 		E45BE0390E8CC647009D7055 /* FreeImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeImage.h; path = ../../../libs/freeimage/include/FreeImage.h; sourceTree = SOURCE_ROOT; };
 		E45BE03F0E8CC650009D7055 /* fmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmod.h; path = ../../../libs/fmodex/include/fmod.h; sourceTree = SOURCE_ROOT; };
 		E45BE0400E8CC650009D7055 /* fmod.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = fmod.hpp; path = ../../../libs/fmodex/include/fmod.hpp; sourceTree = SOURCE_ROOT; };
@@ -339,6 +342,7 @@
 		272F88DF124C1DCE004AEBF5 /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				27E751131253211A0089D6BB /* ofxQtVideoSaver */,
 				272F88E7124C1F07004AEBF5 /* ofxDirList */,
 				272F88EE124C1F07004AEBF5 /* ofxXmlSettings */,
 				272F8872124C1DC9004AEBF5 /* ofxControlPanel */,
@@ -407,6 +411,25 @@
 			);
 			name = src;
 			path = ../../../addons/ofxXmlSettings/src;
+			sourceTree = SOURCE_ROOT;
+		};
+		27E751131253211A0089D6BB /* ofxQtVideoSaver */ = {
+			isa = PBXGroup;
+			children = (
+				27E751141253211A0089D6BB /* src */,
+			);
+			name = ofxQtVideoSaver;
+			path = ../../../addons/ofxQtVideoSaver;
+			sourceTree = SOURCE_ROOT;
+		};
+		27E751141253211A0089D6BB /* src */ = {
+			isa = PBXGroup;
+			children = (
+				27E751151253211A0089D6BB /* ofxQtVideoSaver.cpp */,
+				27E751161253211A0089D6BB /* ofxQtVideoSaver.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxQtVideoSaver/src;
 			sourceTree = SOURCE_ROOT;
 		};
 		E45BE0360E8CC5DE009D7055 /* libs */ = {
@@ -819,6 +842,7 @@
 				272F88FC124C1F07004AEBF5 /* ofxXmlSettings.cpp in Sources */,
 				27E74F4B12528EE40089D6BB /* VideoBuffer.cpp in Sources */,
 				27E74F90125299AF0089D6BB /* VideoDelay.cpp in Sources */,
+				27E751171253211A0089D6BB /* ofxQtVideoSaver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

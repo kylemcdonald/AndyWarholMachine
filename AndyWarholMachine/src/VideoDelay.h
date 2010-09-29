@@ -12,18 +12,24 @@ public:
 	}
 	void add(ofBaseImage& img) {
 		set(writePosition, img);
-		//ofLog(OF_LOG_VERBOSE, "Current write position: " + ofToString(writePosition));
 		writePosition++;
 		if(writePosition == buffer.size())
 			writePosition = 0;
 	}
-	ofImage& read(int offset) {
-		int curPosition = (readPosition + buffer.size() - offset - 1) % buffer.size();
-		//ofLog(OF_LOG_VERBOSE, "Current read position: " + ofToString(curPosition));
-		ofImage& cur = get(curPosition);
+	void setReadPosition(int readPosition) {
+		this->readPosition = readPosition % buffer.size();
+	}
+	ofImage& read() {
+		ofImage& cur = get(readPosition);
 		readPosition++;
 		if(readPosition == buffer.size())
 			readPosition = 0;
 		return cur;
+	}
+	float getReadPosition() {
+		return (float) readPosition / buffer.size();
+	}
+	float getWritePosition() {
+		return (float) writePosition / buffer.size();
 	}
 };

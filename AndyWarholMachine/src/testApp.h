@@ -8,6 +8,7 @@
 #include "ofxAutoControlPanel.h"
 #include "DelayTimer.h"
 #include "RateTimer.h"
+#include "ofxQtVideoSaver.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -40,4 +41,6 @@ public:
 	ofImage curDelay;
 	int maxDelay;
 	DelayTimer delayTimer;
+	
+	ofxQtVideoSaver videoSaver;
 };
