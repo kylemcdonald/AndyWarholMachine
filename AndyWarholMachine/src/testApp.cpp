@@ -30,8 +30,8 @@ void testApp::setup(){
 	
 	// panel setup
 	panel.setup("Control Panel", 10, 10, 300, 700);
-	panel.addPanel("Main", 1);
-	panel.setWhichPanel("Main");
+	panel.addPanel("Detection", 1);
+	panel.setWhichPanel("Detection");
 	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
 	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
@@ -42,7 +42,13 @@ void testApp::setup(){
 	panel.addSlider("Deviation Low Threshold", "devMinThreshold", 0, 0, 60, true);
 	panel.addSlider("Deviation High Threshold", "devMaxThreshold", 0, 0, 60, true);
 	panel.addToggle("Deviation Status", "devStatus", false);
-	panel.addToggle("Combined Status", "combinedStatus", false);
+	
+	panel.addPanel("Recording", 0);
+	panel.setWhichPanel("Recording");
+	panel.addToggle("Use Manual Presence", "useManualPresence", false);
+	panel.addToggle("Manual Presence", "manualPresence", false);
+	panel.addToggle("Automatic Presence", "automaticPresence", false);
+	panel.addToggle("Presence", "presence", false);
 	
 	panel.addPanel("Delay", 1);
 	panel.setWhichPanel("Delay");
@@ -105,7 +111,12 @@ void testApp::update(){
 	
 	panel.setValueB("avgStatus", avgGrapher.getStatus());
 	panel.setValueB("devStatus", devGrapher.getStatus());
-	panel.setValueB("combinedStatus", avgGrapher.getStatus() && devGrapher.getStatus());
+	panel.setValueB("automaticPresence", avgGrapher.getStatus() && devGrapher.getStatus());
+	
+	if(panel.getValueB("useManualPresence"))
+		panel.setValueB("presence", panel.getValueB("manualPresence"));
+	else
+		panel.setValueB("presence", panel.getValueB("automaticPresence"));
 	
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());

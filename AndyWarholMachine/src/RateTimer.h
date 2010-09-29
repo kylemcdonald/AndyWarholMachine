@@ -9,7 +9,8 @@ protected:
 	float smoothing;
 	bool secondTick;
 public:
-	RateTimer() {
+	RateTimer() :
+	smoothing(.9) {
 		reset();
 	}
 	void reset() {
