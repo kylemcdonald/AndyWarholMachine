@@ -74,7 +74,8 @@ void Grapher::draw(float x, float y, float width, float height) {
 	int top = 15;
 	int bottom = height - 5;
 	ofDrawBitmapString(ofToString((int) max), 5, top);
-	ofDrawBitmapString(ofToString((int) values.front()), 5, (top + bottom) / 2);
+	if(!values.empty())
+		ofDrawBitmapString(ofToString((int) values.front()), 5, (top + bottom) / 2);
 	ofDrawBitmapString(ofToString((int) min), 5, bottom);
 	
 	ofPopMatrix();

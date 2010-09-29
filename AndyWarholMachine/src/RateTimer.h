@@ -14,13 +14,17 @@ public:
 	}
 	void reset() {
 		lastTick = 0;
+		averagePeriod = 0;
 		secondTick = false;
 	}
 	void setSmoothing(float smoothing) {
 		this->smoothing = smoothing;
 	}
 	float getFramerate() {
-		return 1 / averagePeriod;
+		if(averagePeriod == 0)
+			return 0;
+		else
+			return 1 / averagePeriod;
 	}
 	void tick() {
 		float curTick = ofGetElapsedTimef();

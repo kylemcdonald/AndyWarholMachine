@@ -32,7 +32,7 @@ public:
 	
 	Grapher avgGrapher, devGrapher;
 	
-	int cameraFrames;
+	unsigned long cameraFrames;
 	
 	ofxAutoControlPanel panel;
 	

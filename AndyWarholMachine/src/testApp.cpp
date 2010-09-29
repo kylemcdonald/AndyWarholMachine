@@ -54,28 +54,29 @@ void testApp::setup(){
 void testApp::update(){
 	camera.update();
 	if(camera.isFrameNew()) {
-		if(cameraFrames < 10) {
-			background.set(camera);
+		if(cameraFrames++ < 10) {
 			cameraReady = false;
+			background.set(camera);
 		} else {
-			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
 			cameraReady = true;
+			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
+			if(cameraFpsTimer.getFramerate() < (15 + 30) / 2)
+				videoDelay.add(camera); // double up frames for 15 fps
+			videoDelay.add(camera);
+			cameraFpsTimer.tick();
 		}
-		background.update();
 		
-		videoDelay.add(camera);
+		background.update();
 		
 		difference.makeAbsoluteDifference(background, camera);
 		difference.update();
 		avgGrapher.addValue(difference.getAverage());
 		devGrapher.addValue(difference.getStandardDeviation());
 		
-		cameraFrames++;
-		
-		cameraFpsTimer.tick();
-		
-		cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
-		appFpsGrapher.addValue(appFpsTimer.getFramerate());
+		if(cameraFrames > 1) {
+			cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
+			appFpsGrapher.addValue(appFpsTimer.getFramerate());
+		}
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
