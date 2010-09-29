@@ -7,6 +7,7 @@
 #include "VideoDelay.h"
 #include "ofxAutoControlPanel.h"
 #include "DelayTimer.h"
+#include "RateTimer.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -23,6 +24,8 @@ public:
 	void windowResized(int w, int h);
 	
 	ofVideoGrabber camera;
+	RateTimer cameraFpsTimer, appFpsTimer;
+	Grapher cameraFpsGrapher, appFpsGrapher;
 	bool cameraReady;
 	FloatImage background;
 	DifferenceImage difference;

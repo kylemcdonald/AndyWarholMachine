@@ -3,6 +3,11 @@
 void testApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
+	cameraFpsTimer.setSmoothing(.9);
+	appFpsTimer.setSmoothing(.9);
+	cameraFpsGrapher.setup(180, 60, 0, 60);
+	appFpsGrapher.setup(180, 60, 0, 800);
+	
 	int camWidth = 640;
 	int camHeight = 480;	
 	int camFramerate = 30;
@@ -41,6 +46,9 @@ void testApp::setup(){
 	panel.setWhichPanel("Delay");
 	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
 	panel.addSlider("Playback Framerate", "playbackFramerate", 10, 1, 60, true);
+	panel.addDrawableRect("Camera Framerate", &cameraFpsGrapher, 180, 60);
+	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
+
 }
 
 void testApp::update(){
@@ -63,6 +71,11 @@ void testApp::update(){
 		devGrapher.addValue(difference.getStandardDeviation());
 		
 		cameraFrames++;
+		
+		cameraFpsTimer.tick();
+		
+		cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
+		appFpsGrapher.addValue(appFpsTimer.getFramerate());
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
@@ -91,9 +104,10 @@ void testApp::draw(){
 	background.draw(320 * 1, 0, 320, 240);
 	difference.draw(320 * 2, 0, 320, 240);
 	curDelay.draw(320 * 3, 0, 320, 240);
-	ofDrawBitmapString(ofToString((int) ofGetFrameRate()), 10, 20);
 	ofPopMatrix();
 	ofPopStyle();
+	
+	appFpsTimer.tick();
 }
 
 void testApp::keyPressed(int key){
