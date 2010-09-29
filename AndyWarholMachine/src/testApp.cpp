@@ -21,6 +21,7 @@ void testApp::setup(){
 	difference.setup(camWidth, camHeight);
 	
 	videoSaver.setup(camWidth, camHeight, "output.mov");
+	curArchive.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
 	avgGrapher.setup(180, 60, 0, 60);
 	devGrapher.setup(180, 60, 0, 60);
@@ -138,13 +139,16 @@ void testApp::draw(){
 	float imgAspect = imgWidth / imgHeight;
 	float scrWidth = ofGetWidth();
 	float scrHeight = ofGetHeight();
-	curDelay.setAnchorPercent(.5, .5);	
 	glPushMatrix();
+	
+	ofImage& target = panel.getValueB("presence") ? curDelay : curArchive;
+		
 	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
+	target.setAnchorPercent(.5, .5);	
 	if(panel.getValueB("letterboxVideo"))
-		curDelay.draw(0, 0, scrHeight * imgAspect, scrHeight);
+		target.draw(0, 0, scrHeight * imgAspect, scrHeight);
 	else
-		curDelay.draw(0, 0, scrWidth, scrWidth / imgAspect);
+		target.draw(0, 0, scrWidth, scrWidth / imgAspect);
 	glPopMatrix();
 	
 	ofPopMatrix();

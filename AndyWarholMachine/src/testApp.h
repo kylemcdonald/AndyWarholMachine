@@ -43,4 +43,5 @@ public:
 	DelayTimer delayTimer;
 	
 	ofxQtVideoSaver videoSaver;
+	ofImage curArchive;
 };
