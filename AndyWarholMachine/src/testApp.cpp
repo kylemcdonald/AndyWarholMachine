@@ -29,9 +29,10 @@ void testApp::setup(){
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
 	// panel setup
-	panel.setup("Control Panel", 10, 10, 300, 700);
-	panel.addPanel("Detection", 1);
+	panel.setup("Control Panel", 10, 10, 500, 720);
+	panel.addPanel("Detection", 2);
 	panel.setWhichPanel("Detection");
+	panel.setWhichColumn(0);
 	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
 	panel.addToggle("Set Low Threshold", "setLowThreshold", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
@@ -42,8 +43,12 @@ void testApp::setup(){
 	panel.addSlider("Deviation Low Threshold", "devMinThreshold", 0, 0, 60, true);
 	panel.addSlider("Deviation High Threshold", "devMaxThreshold", 0, 0, 60, true);
 	panel.addToggle("Deviation Status", "devStatus", false);
+	panel.setWhichColumn(1);
+	panel.addDrawableRect("Camera Input", &camera, 240, 180);
+	panel.addDrawableRect("Background", &background, 240, 180);
+	panel.addDrawableRect("Difference", &difference, 240, 180);
 	
-	panel.addPanel("Recording", 0);
+	panel.addPanel("Recording", 1);
 	panel.setWhichPanel("Recording");
 	panel.addToggle("Use Manual Presence", "useManualPresence", false);
 	panel.addToggle("Manual Presence", "manualPresence", false);
@@ -52,12 +57,17 @@ void testApp::setup(){
 	
 	panel.addPanel("Delay", 1);
 	panel.setWhichPanel("Delay");
+	panel.setWhichColumn(0);
 	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
 	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
 	panel.addDrawableRect("Camera Framerate", &cameraFpsGrapher, 180, 60);
 	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
 	panel.addSlider("Write Position", "writePosition", 0, 0, 1, false);
 	panel.addSlider("Read Position", "readPosition", 0, 0, 1, false);
+	
+	panel.addPanel("Output", 1);
+	panel.setWhichPanel("Output");
+	panel.addToggle("Letterbox Video", "letterboxVideo", false);
 }
 
 void testApp::update(){
@@ -125,11 +135,23 @@ void testApp::update(){
 void testApp::draw(){
 	ofPushStyle();
 	ofPushMatrix();
-	ofSetColor(255, 255, 255);
-	camera.draw(320 * 0, 0, 320, 240);
-	background.draw(320 * 1, 0, 320, 240);
-	difference.draw(320 * 2, 0, 320, 240);
-	curDelay.draw(320 * 3, 0, 320, 240);
+	
+	ofBackground(0, 0, 0);
+	
+	float imgWidth = curDelay.getWidth();
+	float imgHeight = curDelay.getHeight();
+	float imgAspect = imgWidth / imgHeight;
+	float scrWidth = ofGetWidth();
+	float scrHeight = ofGetHeight();
+	curDelay.setAnchorPercent(.5, .5);
+	glPushMatrix();
+	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
+	if(panel.getValueB("letterboxVideo"))
+		curDelay.draw(0, 0, scrHeight * imgAspect, scrHeight);
+	else
+		curDelay.draw(0, 0, scrWidth, scrWidth / imgAspect);
+	glPopMatrix();
+	
 	ofPopMatrix();
 	ofPopStyle();
 	

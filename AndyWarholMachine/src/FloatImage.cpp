@@ -28,12 +28,20 @@ void FloatImage::update() {
 	img.update();
 }
 
-void FloatImage::draw(int x, int y) {
+void FloatImage::draw(float x, float y) {
 	img.draw(x, y);
 }
 
-void FloatImage::draw(int x, int y, int width, int height) {
+void FloatImage::draw(float x, float y, float width, float height) {
 	img.draw(x, y, width, height);
+}
+
+float FloatImage::getWidth() {
+	return img.getWidth();
+}
+
+float FloatImage::getHeight() {
+	return img.getHeight();
 }
 
 void FloatImage::lerp(float amt, ofBaseImage& img) {

@@ -26,6 +26,8 @@ public:
 			else
 				hide();
 		}
+		if(event.key == 'f')
+			ofToggleFullscreen();
 	}
 	void mousePressed(ofMouseEventArgs& event) {
 		ofxControlPanel::mousePressed(event.x, event.y, event.button);
