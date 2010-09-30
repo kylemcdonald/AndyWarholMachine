@@ -37,9 +37,10 @@ void testApp::setup(){
 
 void testApp::setupControlPanel() {
 	// panel setup
-	panel.setup("Control Panel", 10, 10, 500, 720);
-	panel.addPanel("Detection", 2);
+	panel.setup("Control Panel", 10, 10, 740, 800);
+	panel.addPanel("Detection", 3);
 	panel.setWhichPanel("Detection");
+	
 	panel.setWhichColumn(0);
 	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
@@ -48,23 +49,21 @@ void testApp::setupControlPanel() {
 	panel.addDrawableRect("Difference Deviation", &devGrapher, 180, 60);
 	panel.addSlider("Deviation Threshold", "devThreshold", 0, 0, 60, true);
 	panel.addToggle("Deviation Status", "devStatus", false);
-	panel.setWhichColumn(1);
-	panel.addDrawableRect("Camera Input", &camera, 240, 180);
-	panel.addDrawableRect("Background", &background, 240, 180);
-	panel.addDrawableRect("Difference", &difference, 240, 180);
-	
-	panel.addPanel("Recording", 1);
-	panel.setWhichPanel("Recording");
 	panel.addToggle("Use Manual Presence", "useManualPresence", true);
 	panel.addToggle("Manual Presence", "manualPresence", false);
 	panel.addToggle("Automatic Presence", "automaticPresence", false);
 	panel.addToggle("Raw Presence", "rawPresence", false);
 	panel.addToggle("Presence", "presence", false);
+	panel.addToggle("Interaction Mode", "interactionMode", false);
 	
-	panel.addPanel("Delay", 1);
-	panel.setWhichPanel("Delay");
-	panel.setWhichColumn(0);
-	panel.addSlider("Delay Amount", "delayAmount", 0, 0, (maxDelay * camFramerate) - 1, true);
+	panel.setWhichColumn(1);
+	panel.addDrawableRect("Camera Input", &camera, 240, 180);
+	panel.addDrawableRect("Background", &background, 240, 180);
+	panel.addDrawableRect("Difference", &difference, 240, 180);
+	
+	panel.setWhichColumn(2);	
+	panel.addSlider("Start Delay", "startDelay", 4, 0, maxDelay, false);
+	panel.addSlider("Stop Delay", "stopDelay", 2, 0, maxDelay, false);
 	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
 	panel.addDrawableRect("Camera Framerate", &cameraFpsGrapher, 180, 60);
 	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
@@ -73,6 +72,7 @@ void testApp::setupControlPanel() {
 }
 
 void testApp::update(){
+	// check for a new frame and update adaptive background
 	camera.update();
 	if(camera.isFrameNew()) {
 		if(cameraFrames++ < 2) {
@@ -81,7 +81,6 @@ void testApp::update(){
 		} else {
 			cameraReady = true;
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
-					
 			cameraFpsTimer.tick();
 		}
 		
@@ -96,19 +95,6 @@ void testApp::update(){
 			cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
 			appFpsGrapher.addValue(appFpsTimer.getFramerate());
 		}
-	}
-	
-	if(cameraTimer.tick()) {
-		videoDelay.add(camera);
-		videoSaver.addFrame(camera.getPixels(), 1. / camFramerate);
-	}
-	
-	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
-	if(delayTimer.tick() && cameraReady) {
-		int delayAmount = panel.getValueI("delayAmount");
-		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
-		memcpy(curDelay.getPixels(), videoDelay.read().getPixels(), n);
-		curDelay.update();
 	}
 	
 	avgGrapher.setThreshold(panel.getValueI("avgThreshold"));
@@ -129,6 +115,7 @@ void testApp::update(){
 		videoSaver.setup(camWidth, camHeight, filename.str());
 		curArchive.setPaused(true);
 		recording = true;
+		videoDelay.setReadFromWrite();
 	}	
 	
 	if(presenceWait.wasUntriggered()) {
@@ -139,9 +126,29 @@ void testApp::update(){
 		updateArchive();
 	}
 	
+	// set interaction mode based on presence plus some duration of time
+	if(presenceWait.get() && presenceWait.length() > panel.getValueF("startDelay"))
+		panel.setValueB("interactionMode", true);
+	if(!presenceWait.get() && presenceWait.length() > panel.getValueF("stopDelay"))
+		panel.setValueB("interactionMode", false);
+		
 	if(curArchive.getIsMovieDone())
 		randomArchive();
 	
+	// add new frames to video delay and video saver
+	if(cameraTimer.tick()) {
+		videoDelay.add(camera);
+		if(recording)
+			videoSaver.addFrame(camera.getPixels(), 1. / camFramerate);
+	}
+	
+	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
+	if(delayTimer.tick() && cameraReady && panel.getValueB("interactionMode")) {
+		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
+		memcpy(curDelay.getPixels(), videoDelay.read().getPixels(), n);
+		curDelay.update();
+	}
+
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());
 }
@@ -158,7 +165,7 @@ void testApp::draw(){
 	glPushMatrix();
 	
 	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
-	if(panel.getValueB("presence")) {
+	if(panel.getValueB("interactionMode")) {
 		curDelay.setAnchorPercent(.5, .5);
 		curDelay.draw(0, 0, scrWidth, scrWidth / camAspect);
 	} else {

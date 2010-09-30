@@ -32,4 +32,7 @@ public:
 	float getWritePosition() {
 		return (float) writePosition / buffer.size();
 	}
+	void setReadFromWrite() {
+		readPosition = writePosition;
+	}
 };

@@ -51,4 +51,7 @@ public:
 		}
 		return false;
 	}
+	float length() {
+		return ofGetElapsedTimef() - lastTime;
+	}
 };
