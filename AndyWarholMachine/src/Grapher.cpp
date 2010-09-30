@@ -50,7 +50,7 @@ void Grapher::draw(float x, float y, float width, float height) {
 	glBegin(GL_LINE_STRIP);
 	int i = 0;
 	for(list<float>::iterator itr = values.begin(); itr != values.end(); itr++) {
-		glVertex2f(this->width - i, ofMap(*itr, min, max, height, 0));
+		glVertex2f(this->width - i, ofMap(*itr, min, max, height, 0, true));
 		i++;
 	}
 	glEnd();

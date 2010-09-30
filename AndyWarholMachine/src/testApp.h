@@ -9,6 +9,7 @@
 #include "DelayTimer.h"
 #include "RateTimer.h"
 #include "ofxQtVideoSaver.h"
+#include "Hysterisis.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -37,6 +38,7 @@ public:
 	
 	ofxAutoControlPanel panel;
 	
+	Hysterisis presenceWait;
 	VideoDelay videoDelay;
 	ofImage curDelay;
 	int maxDelay;

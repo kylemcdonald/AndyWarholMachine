@@ -193,6 +193,7 @@
 		27E750551252FEC60089D6BB /* RateTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RateTimer.h; sourceTree = "<group>"; };
 		27E751151253211A0089D6BB /* ofxQtVideoSaver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxQtVideoSaver.cpp; path = ../../../addons/ofxQtVideoSaver/src/ofxQtVideoSaver.cpp; sourceTree = SOURCE_ROOT; };
 		27E751161253211A0089D6BB /* ofxQtVideoSaver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxQtVideoSaver.h; path = ../../../addons/ofxQtVideoSaver/src/ofxQtVideoSaver.h; sourceTree = SOURCE_ROOT; };
+		27E751F7125421430089D6BB /* Hysterisis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hysterisis.h; sourceTree = "<group>"; };
 		E45BE0390E8CC647009D7055 /* FreeImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeImage.h; path = ../../../libs/freeimage/include/FreeImage.h; sourceTree = SOURCE_ROOT; };
 		E45BE03F0E8CC650009D7055 /* fmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmod.h; path = ../../../libs/fmodex/include/fmod.h; sourceTree = SOURCE_ROOT; };
 		E45BE0400E8CC650009D7055 /* fmod.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = fmod.hpp; path = ../../../libs/fmodex/include/fmod.hpp; sourceTree = SOURCE_ROOT; };
@@ -640,6 +641,7 @@
 				27E74F8F125299AF0089D6BB /* VideoDelay.cpp */,
 				27E74FE11252B9200089D6BB /* DelayTimer.h */,
 				27E750551252FEC60089D6BB /* RateTimer.h */,
+				27E751F7125421430089D6BB /* Hysterisis.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

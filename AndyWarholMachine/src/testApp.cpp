@@ -5,8 +5,8 @@ void testApp::setup(){
 	
 	cameraFpsTimer.setSmoothing(.9);
 	appFpsTimer.setSmoothing(.9);
-	cameraFpsGrapher.setup(180, 60, 0, 60);
-	appFpsGrapher.setup(180, 60, 0, 800);
+	cameraFpsGrapher.setup(180, 60, 0, 30);
+	appFpsGrapher.setup(180, 60, 30, 120);
 	
 	int camWidth = 640;
 	int camHeight = 480;	
@@ -20,11 +20,12 @@ void testApp::setup(){
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
+	presenceWait.setDelay(1);
 	videoSaver.setup(camWidth, camHeight, "output.mov");
 	curArchive.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
-	avgGrapher.setup(180, 60, 0, 60);
-	devGrapher.setup(180, 60, 0, 60);
+	avgGrapher.setup(180, 60, 0, 30);
+	devGrapher.setup(180, 60, 0, 30);
 	
 	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
@@ -51,6 +52,7 @@ void testApp::setup(){
 	panel.addToggle("Use Manual Presence", "useManualPresence", false);
 	panel.addToggle("Manual Presence", "manualPresence", false);
 	panel.addToggle("Automatic Presence", "automaticPresence", false);
+	panel.addToggle("Raw Presence", "rawPresence", false);
 	panel.addToggle("Presence", "presence", false);
 	
 	panel.addPanel("Delay", 1);
@@ -71,7 +73,7 @@ void testApp::setup(){
 void testApp::update(){
 	camera.update();
 	if(camera.isFrameNew()) {
-		if(cameraFrames++ < 10) {
+		if(cameraFrames++ < 2) {
 			cameraReady = false;
 			background.set(camera);
 		} else {
@@ -119,10 +121,9 @@ void testApp::update(){
 	panel.setValueB("devStatus", devGrapher.getStatus());
 	panel.setValueB("automaticPresence", avgGrapher.getStatus() && devGrapher.getStatus());
 	
-	if(panel.getValueB("useManualPresence"))
-		panel.setValueB("presence", panel.getValueB("manualPresence"));
-	else
-		panel.setValueB("presence", panel.getValueB("automaticPresence"));
+	panel.setValueB("rawPresence", panel.getValueB(panel.getValueB("useManualPresence")  ? "manualPresence" : "automaticPresence"));	
+	presenceWait.set(panel.getValueB("rawPresence"));
+	panel.setValueB("presence", presenceWait.get());
 	
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());
