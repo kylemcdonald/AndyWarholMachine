@@ -113,7 +113,6 @@ void testApp::update(){
 		filename << "screenTests/" << (unsigned long) time(NULL) << ".mov";
 		ofLog(OF_LOG_VERBOSE, "Started recording to " + filename.str());
 		videoSaver.setup(camWidth, camHeight, filename.str());
-		curArchive.setPaused(true);
 		recording = true;
 		videoDelay.setReadFromWrite();
 	}	
