@@ -2,26 +2,26 @@
 
 void testApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
-	
+
 	cameraFpsTimer.setSmoothing(.9);
 	appFpsTimer.setSmoothing(.9);
 	cameraFpsGrapher.setup(180, 60, 0, 30);
 	appFpsGrapher.setup(180, 60, 30, 120);
-	
-	int camWidth = 640;
-	int camHeight = 480;	
+											
+	camWidth = 640;
+	camHeight = 480;	
 	int camFramerate = 30;
 	maxDelay = 10;
 	
 	cameraFrames = 0;
 	camera.initGrabber(camWidth, camHeight);
-	camera.setDesiredFrameRate(30);
+	cameraTimer.setFramerate(30);
 	cameraReady = false;
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
 	presenceWait.setDelay(1);
-	videoSaver.setup(camWidth, camHeight, "output.mov");
+	recording = false;
 	curArchive.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
 	avgGrapher.setup(180, 60, 0, 30);
@@ -79,18 +79,8 @@ void testApp::update(){
 		} else {
 			cameraReady = true;
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
-			
-			if(cameraFpsTimer.getFramerate() < (15 + 30) / 2)
-				videoDelay.add(camera); // double up frames for 15 fps
-			videoDelay.add(camera);
-			
+					
 			cameraFpsTimer.tick();
-		}
-		
-		if(cameraFrames < 30 * 10) {
-			videoSaver.addFrame(camera.getPixels(), 1. / 30);
-		} else if(cameraFrames == 30 * 10) {
-			videoSaver.finishMovie();
 		}
 		
 		background.update();
@@ -104,6 +94,11 @@ void testApp::update(){
 			cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
 			appFpsGrapher.addValue(appFpsTimer.getFramerate());
 		}
+	}
+	
+	if(cameraTimer.tick()) {
+		videoDelay.add(camera);
+		videoSaver.addFrame(camera.getPixels(), 1. / 30);
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
@@ -124,6 +119,20 @@ void testApp::update(){
 	panel.setValueB("rawPresence", panel.getValueB(panel.getValueB("useManualPresence")  ? "manualPresence" : "automaticPresence"));	
 	presenceWait.set(panel.getValueB("rawPresence"));
 	panel.setValueB("presence", presenceWait.get());
+	
+	if(presenceWait.wasTriggered()) {
+		stringstream filename;
+		filename << "screenTests/" << (unsigned long) time(NULL) << ".mov";
+		ofLog(OF_LOG_VERBOSE, "Started recording to " + filename.str());
+		videoSaver.setup(camWidth, camHeight, filename.str());
+		recording = true;
+	}	
+	
+	if(presenceWait.wasUntriggered()) {
+		videoSaver.finishMovie();
+		ofLog(OF_LOG_VERBOSE, "Stopped recording");
+		recording = false;
+	}
 	
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());

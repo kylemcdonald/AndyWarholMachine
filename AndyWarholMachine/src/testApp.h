@@ -25,7 +25,10 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void windowResized(int w, int h);
 	
+	int camWidth, camHeight;
+	
 	ofVideoGrabber camera;
+	DelayTimer cameraTimer;
 	RateTimer cameraFpsTimer, appFpsTimer;
 	Grapher cameraFpsGrapher, appFpsGrapher;
 	bool cameraReady;
@@ -45,5 +48,6 @@ public:
 	DelayTimer delayTimer;
 	
 	ofxQtVideoSaver videoSaver;
+	bool recording;
 	ofImage curArchive;
 };
