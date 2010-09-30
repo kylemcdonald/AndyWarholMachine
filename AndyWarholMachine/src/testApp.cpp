@@ -10,19 +10,18 @@ void testApp::setup(){
 											
 	camWidth = 640;
 	camHeight = 480;	
-	int camFramerate = 30;
+	camFramerate = 30;
 	maxDelay = 10;
 	
 	cameraFrames = 0;
 	camera.initGrabber(camWidth, camHeight);
-	cameraTimer.setFramerate(30);
+	cameraTimer.setFramerate(camFramerate);
 	cameraReady = false;
 	background.setup(camWidth, camHeight);
 	difference.setup(camWidth, camHeight);
 	
 	presenceWait.setDelay(1);
 	recording = false;
-	curArchive.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
 	avgGrapher.setup(180, 60, 0, 30);
 	devGrapher.setup(180, 60, 0, 30);
@@ -30,6 +29,13 @@ void testApp::setup(){
 	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
 	
+	setupControlPanel();
+	
+	updateArchive();
+	randomArchive();
+}
+
+void testApp::setupControlPanel() {
 	// panel setup
 	panel.setup("Control Panel", 10, 10, 500, 720);
 	panel.addPanel("Detection", 2);
@@ -49,7 +55,7 @@ void testApp::setup(){
 	
 	panel.addPanel("Recording", 1);
 	panel.setWhichPanel("Recording");
-	panel.addToggle("Use Manual Presence", "useManualPresence", false);
+	panel.addToggle("Use Manual Presence", "useManualPresence", true);
 	panel.addToggle("Manual Presence", "manualPresence", false);
 	panel.addToggle("Automatic Presence", "automaticPresence", false);
 	panel.addToggle("Raw Presence", "rawPresence", false);
@@ -64,10 +70,6 @@ void testApp::setup(){
 	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
 	panel.addSlider("Write Position", "writePosition", 0, 0, 1, false);
 	panel.addSlider("Read Position", "readPosition", 0, 0, 1, false);
-	
-	panel.addPanel("Output", 1);
-	panel.setWhichPanel("Output");
-	panel.addToggle("Letterbox Video", "letterboxVideo", false);
 }
 
 void testApp::update(){
@@ -98,7 +100,7 @@ void testApp::update(){
 	
 	if(cameraTimer.tick()) {
 		videoDelay.add(camera);
-		videoSaver.addFrame(camera.getPixels(), 1. / 30);
+		videoSaver.addFrame(camera.getPixels(), 1. / camFramerate);
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
@@ -125,6 +127,7 @@ void testApp::update(){
 		filename << "screenTests/" << (unsigned long) time(NULL) << ".mov";
 		ofLog(OF_LOG_VERBOSE, "Started recording to " + filename.str());
 		videoSaver.setup(camWidth, camHeight, filename.str());
+		curArchive.setPaused(true);
 		recording = true;
 	}	
 	
@@ -132,7 +135,12 @@ void testApp::update(){
 		videoSaver.finishMovie();
 		ofLog(OF_LOG_VERBOSE, "Stopped recording");
 		recording = false;
+		randomArchive();
+		updateArchive();
 	}
+	
+	if(curArchive.getIsMovieDone())
+		randomArchive();
 	
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());
@@ -144,21 +152,19 @@ void testApp::draw(){
 	
 	ofBackground(0, 0, 0);
 	
-	float imgWidth = curDelay.getWidth();
-	float imgHeight = curDelay.getHeight();
-	float imgAspect = imgWidth / imgHeight;
+	float camAspect = (float) camWidth / camHeight;
 	float scrWidth = ofGetWidth();
 	float scrHeight = ofGetHeight();
 	glPushMatrix();
 	
-	ofImage& target = panel.getValueB("presence") ? curDelay : curArchive;
-		
 	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
-	target.setAnchorPercent(.5, .5);	
-	if(panel.getValueB("letterboxVideo"))
-		target.draw(0, 0, scrHeight * imgAspect, scrHeight);
-	else
-		target.draw(0, 0, scrWidth, scrWidth / imgAspect);
+	if(panel.getValueB("presence")) {
+		curDelay.setAnchorPercent(.5, .5);
+		curDelay.draw(0, 0, scrWidth, scrWidth / camAspect);
+	} else {
+		curArchive.setAnchorPercent(.5, .5);
+		curArchive.draw(0, 0, scrWidth, scrWidth / camAspect);
+	}
 	glPopMatrix();
 	
 	ofPopMatrix();
@@ -188,3 +194,19 @@ void testApp::mouseReleased(int x, int y, int button){
 void testApp::windowResized(int w, int h){
 }
 
+void testApp::exit() {
+	if(recording)
+		videoSaver.finishMovie();
+}
+
+void testApp::updateArchive() {
+	archiveSize = archive.listDir("screenTests");
+}
+
+void testApp::randomArchive() {
+	string filename = archive.getPath((int) ofRandom(0, archiveSize));
+	curArchive.loadMovie(filename);
+	curArchive.play();
+	curArchive.setLoopState(false);
+	curArchive.setSpeed(panel.getValueF("playbackFramerate") / (float) camFramerate);
+}

@@ -47,6 +47,7 @@ void Grapher::draw(float x, float y, float width, float height) {
 	ofRect(0, 0, width, height);
 	glPushMatrix();
 	glScalef(width / (this->width), 1, 0);
+	
 	glBegin(GL_LINE_STRIP);
 	int i = 0;
 	for(list<float>::iterator itr = values.begin(); itr != values.end(); itr++) {
@@ -56,7 +57,7 @@ void Grapher::draw(float x, float y, float width, float height) {
 	glEnd();
 	glPopMatrix();
 	
-	int thresholdY = ofMap(threshold, min, max, height, 0);
+	int thresholdY = ofMap(threshold, min, max, height, 0, true);
 	ofLine(0, thresholdY, width, thresholdY);
 	
 	int top = 15;

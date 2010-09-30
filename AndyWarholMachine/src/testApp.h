@@ -14,8 +14,10 @@
 class testApp : public ofBaseApp{
 public:
 	void setup();
+	void setupControlPanel();
 	void update();
 	void draw();
+	void exit();
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -25,7 +27,7 @@ public:
 	void mouseReleased(int x, int y, int button);
 	void windowResized(int w, int h);
 	
-	int camWidth, camHeight;
+	int camWidth, camHeight, camFramerate;
 	
 	ofVideoGrabber camera;
 	DelayTimer cameraTimer;
@@ -49,5 +51,10 @@ public:
 	
 	ofxQtVideoSaver videoSaver;
 	bool recording;
-	ofImage curArchive;
+	ofxDirList archive;
+	int archiveSize;
+	ofVideoPlayer curArchive;
+	
+	void updateArchive();
+	void randomArchive();
 };
