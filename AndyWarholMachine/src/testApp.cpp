@@ -2,12 +2,12 @@
 
 void testApp::setup(){
 	ofSetLogLevel(OF_LOG_VERBOSE);
-
+	
 	cameraFpsTimer.setSmoothing(.9);
 	appFpsTimer.setSmoothing(.9);
 	cameraFpsGrapher.setup(180, 60, 0, 30);
 	appFpsGrapher.setup(180, 60, 30, 120);
-											
+	
 	camWidth = 640;
 	camHeight = 480;	
 	camFramerate = 30;
@@ -37,12 +37,13 @@ void testApp::setup(){
 
 void testApp::setupControlPanel() {
 	// panel setup
-	panel.setup("Control Panel", 10, 10, 740, 800);
+	panel.setup("Control Panel", 10, 10, 740, 850);
 	panel.addPanel("Detection", 3);
 	panel.setWhichPanel("Detection");
 	
 	panel.setWhichColumn(0);
 	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
+	panel.addToggle("Reset Background", "resetBackground", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
 	panel.addSlider("Average Threshold", "avgThreshold", 0, 0, 60, true);
 	panel.addToggle("Average Status", "avgStatus", false);
@@ -75,9 +76,10 @@ void testApp::update(){
 	// check for a new frame and update adaptive background
 	camera.update();
 	if(camera.isFrameNew()) {
-		if(cameraFrames++ < 2) {
+		if(cameraFrames++ < 2 || panel.getValueB("resetBackground")) {
 			cameraReady = false;
 			background.set(camera);
+			panel.setValueB("resetBackround", false);
 		} else {
 			cameraReady = true;
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
@@ -130,7 +132,7 @@ void testApp::update(){
 		panel.setValueB("interactionMode", true);
 	if(!presenceWait.get() && presenceWait.length() > panel.getValueF("stopDelay"))
 		panel.setValueB("interactionMode", false);
-		
+	
 	if(curArchive.getIsMovieDone())
 		randomArchive();
 	
@@ -147,7 +149,7 @@ void testApp::update(){
 		memcpy(curDelay.getPixels(), videoDelay.read().getPixels(), n);
 		curDelay.update();
 	}
-
+	
 	panel.setValueF("writePosition", videoDelay.getWritePosition());
 	panel.setValueF("readPosition", videoDelay.getReadPosition());
 }
@@ -210,9 +212,11 @@ void testApp::updateArchive() {
 }
 
 void testApp::randomArchive() {
-	string filename = archive.getPath((int) ofRandom(0, archiveSize));
-	curArchive.loadMovie(filename);
-	curArchive.play();
-	curArchive.setLoopState(false);
-	curArchive.setSpeed(panel.getValueF("playbackFramerate") / (float) camFramerate);
+	if(archiveSize > 0) {
+		string filename = archive.getPath((int) ofRandom(0, archiveSize));
+		curArchive.loadMovie(filename);
+		curArchive.play();
+		curArchive.setLoopState(false);
+		curArchive.setSpeed(panel.getValueF("playbackFramerate") / (float) camFramerate);
+	}
 }
