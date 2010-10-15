@@ -24,7 +24,6 @@ void testApp::setup(){
 	recording = false;
 	
 	avgGrapher.setup(180, 60, 0, 30);
-	devGrapher.setup(180, 60, 0, 30);
 	
 	videoDelay.setup(camWidth, camHeight, camFramerate * maxDelay);
 	curDelay.allocate(camWidth, camHeight, OF_IMAGE_COLOR);
@@ -37,39 +36,44 @@ void testApp::setup(){
 
 void testApp::setupControlPanel() {
 	// panel setup
-	panel.setup("Control Panel", 10, 10, 740, 850);
-	panel.addPanel("Detection", 3);
+	panel.setup("Control Panel", 10, 10, 500, 730);
+	panel.addPanel("Detection", 2);
 	panel.setWhichPanel("Detection");
 	
-	panel.setWhichColumn(0);
-	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
+	panel.setWhichColumn(0);	
 	panel.addToggle("Reset Background", "resetBackground", false);
 	panel.addDrawableRect("Difference Average", &avgGrapher, 180, 60);
 	panel.addSlider("Average Threshold", "avgThreshold", 0, 0, 60, true);
-	panel.addToggle("Average Status", "avgStatus", false);
-	panel.addDrawableRect("Difference Deviation", &devGrapher, 180, 60);
-	panel.addSlider("Deviation Threshold", "devThreshold", 0, 0, 60, true);
-	panel.addToggle("Deviation Status", "devStatus", false);
-	panel.addToggle("Use Manual Presence", "useManualPresence", true);
-	panel.addToggle("Manual Presence", "manualPresence", false);
-	panel.addToggle("Automatic Presence", "automaticPresence", false);
-	panel.addToggle("Raw Presence", "rawPresence", false);
-	panel.addToggle("Presence", "presence", false);
-	panel.addToggle("Interaction Mode", "interactionMode", false);
+	
+	panel.addSlider("Start Delay", "startDelay", 4, 0, maxDelay, false);
+	panel.addSlider("Stop Delay", "stopDelay", 2, 0, maxDelay, false);
+	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
+	
+	panel.addToggle("Person Detected", "personDetected", false);
+	panel.addToggle("Recording", "recording", false);
+	panel.addToggle("Live Video", "liveVideo", false);
 	
 	panel.setWhichColumn(1);
 	panel.addDrawableRect("Camera Input", &camera, 240, 180);
 	panel.addDrawableRect("Background", &background, 240, 180);
 	panel.addDrawableRect("Difference", &difference, 240, 180);
-	
-	panel.setWhichColumn(2);	
-	panel.addSlider("Start Delay", "startDelay", 4, 0, maxDelay, false);
-	panel.addSlider("Stop Delay", "stopDelay", 2, 0, maxDelay, false);
-	panel.addSlider("Playback Framerate", "playbackFramerate", 20, 1, 60, true);
+		
+	panel.addPanel("Debug", 2);
+	panel.setWhichPanel("Debug");
+	panel.setWhichColumn(0);
+	panel.addSlider("Adapt Speed", "adaptSpeed", 10, 1, 12, false);
+	panel.addToggle("Use Manual Presence", "useManualPresence", false);
+	panel.addToggle("Average Status", "avgStatus", false);
+	panel.addToggle("Manual Presence", "manualPresence", false);
 	panel.addDrawableRect("Camera Framerate", &cameraFpsGrapher, 180, 60);
 	panel.addDrawableRect("App Framerate", &appFpsGrapher, 180, 60);
 	panel.addSlider("Write Position", "writePosition", 0, 0, 1, false);
 	panel.addSlider("Read Position", "readPosition", 0, 0, 1, false);
+	
+	panel.setWhichColumn(1);
+	panel.addDrawableRect("Camera Input", &camera, 240, 180);
+	panel.addDrawableRect("Background", &background, 240, 180);
+	panel.addDrawableRect("Difference", &difference, 240, 180);
 }
 
 void testApp::update(){
@@ -91,7 +95,6 @@ void testApp::update(){
 		difference.makeAbsoluteDifference(background, camera);
 		difference.update();
 		avgGrapher.addValue(difference.getAverage());
-		devGrapher.addValue(difference.getStandardDeviation());
 		
 		if(cameraFrames > 1) {
 			cameraFpsGrapher.addValue(cameraFpsTimer.getFramerate());
@@ -100,15 +103,12 @@ void testApp::update(){
 	}
 	
 	avgGrapher.setThreshold(panel.getValueI("avgThreshold"));
-	devGrapher.setThreshold(panel.getValueI("devThreshold"));
 	
 	panel.setValueB("avgStatus", avgGrapher.getStatus());
-	panel.setValueB("devStatus", devGrapher.getStatus());
-	panel.setValueB("automaticPresence", avgGrapher.getStatus() && devGrapher.getStatus());
 	
-	panel.setValueB("rawPresence", panel.getValueB(panel.getValueB("useManualPresence")  ? "manualPresence" : "automaticPresence"));	
-	presenceWait.set(panel.getValueB("rawPresence"));
-	panel.setValueB("presence", presenceWait.get());
+	panel.setValueB("personDetected", panel.getValueB(panel.getValueB("useManualPresence")  ? "manualPresence" : "avgStatus"));	
+	presenceWait.set(panel.getValueB("personDetected"));
+	panel.setValueB("recording", presenceWait.get());
 	
 	if(presenceWait.wasTriggered()) {
 		stringstream filename;
@@ -129,9 +129,9 @@ void testApp::update(){
 	
 	// set interaction mode based on presence plus some duration of time
 	if(presenceWait.get() && presenceWait.length() > panel.getValueF("startDelay"))
-		panel.setValueB("interactionMode", true);
+		panel.setValueB("liveVideo", true);
 	if(!presenceWait.get() && presenceWait.length() > panel.getValueF("stopDelay"))
-		panel.setValueB("interactionMode", false);
+		panel.setValueB("liveVideo", false);
 	
 	if(curArchive.getIsMovieDone())
 		randomArchive();
@@ -144,7 +144,7 @@ void testApp::update(){
 	}
 	
 	delayTimer.setFramerate(panel.getValueI("playbackFramerate"));
-	if(delayTimer.tick() && cameraReady && panel.getValueB("interactionMode")) {
+	if(delayTimer.tick() && cameraReady && panel.getValueB("liveVideo")) {
 		int n = curDelay.getWidth() * curDelay.getHeight() * 3;
 		memcpy(curDelay.getPixels(), videoDelay.read().getPixels(), n);
 		curDelay.update();
@@ -166,7 +166,7 @@ void testApp::draw(){
 	glPushMatrix();
 	
 	glTranslatef(scrWidth / 2, scrHeight / 2, 0);
-	if(panel.getValueB("interactionMode")) {
+	if(panel.getValueB("liveVideo")) {
 		curDelay.setAnchorPercent(.5, .5);
 		curDelay.draw(0, 0, scrWidth, scrWidth / camAspect);
 	} else {
