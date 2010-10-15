@@ -1,4 +1,7 @@
 build/
 bin/
+!data
+!screenTests
+*.mov
 *.mode1v3
 *.pbxuser
