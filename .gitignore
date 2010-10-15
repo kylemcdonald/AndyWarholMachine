@@ -1,0 +1,4 @@
+build/
+bin/
+*.mode1v3
+*.pbxuser
