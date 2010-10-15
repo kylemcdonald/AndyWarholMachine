@@ -79,7 +79,7 @@ void testApp::update(){
 		if(cameraFrames++ < 2 || panel.getValueB("resetBackground")) {
 			cameraReady = false;
 			background.set(camera);
-			panel.setValueB("resetBackround", false);
+			panel.setValueB("resetBackground", false);
 		} else {
 			cameraReady = true;
 			background.lerp(2. / powf(2., panel.getValueF("adaptSpeed")), camera);
